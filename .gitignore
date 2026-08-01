@@ -1,0 +1,35 @@
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+/.[Dd]irectory[Ii]mporterCache/
+
+# Asset Store缓存
+/AssetStoreTools*
+
+# 包管理器缓存
+/Packages/manifest.json.backup
+/Packages/packages-lock.json.bak
+
+# Addressables缓存
+/AddressableAssetsData/AssetGroupsCache/
+/AddressableAssetsData/Cache/
+
+# VS
+*.csproj
+*.sln
+.vs/
+*.user
+*.userprefs
+
+# macOS
+.DS_Store
+.AppleDouble
+._*
+
+# Windows
+Thumbs.db
