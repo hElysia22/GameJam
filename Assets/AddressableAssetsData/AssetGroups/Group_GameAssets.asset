@@ -14,7 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Group_GameAssets
   m_GUID: 0a032a97ce030e54bb7b2ef8f3522257
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 0be5580c989889c489a0e9cefc99e60f
+    m_Address: Assets/Art/Sprites/map_packed.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39fdb5ffa25ebcb4cbe3ceacffce7aef
+    m_Address: Assets/Art/Sprites/tilemap_packed.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 413fba5d102e3c54291bb48f97f828cd
+    m_Address: Assets/Art/Sprites/characters_packed.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc03c8e8b458f5748b3d84c159ece6c8
+    m_Address: Assets/Art/Sprites/backgrounds_packed.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1b4a9d787dc170b40bd1332a8a73f4a6, type: 2}
   m_SchemaSet:
