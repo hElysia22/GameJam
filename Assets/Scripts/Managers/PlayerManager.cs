@@ -8,22 +8,42 @@ public class PlayerManager : MonoBehaviour
 
     public PlayerStats stats;
 
+    [Header("吹风粒子（作为玩家子物体挂载）")]
+    public ParticleSystem windVfx;
+
     private Vector2 moveDir;
-    private Vector2 faceDir = Vector2.right;
+    public Vector2 faceDir = Vector2.right;
 
     private bool isOnGround = true;
     private bool canBlowWind = true;
     private float windCoolTimer;
+
+    [Header("复活点")]
+    public Vector2 respPos { get; set; }
+
+    // 管道输入事件
+    public event System.Action<InputAction.CallbackContext> MovePerformedEvent;
+
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         spr = GetComponent<SpriteRenderer>();
         windCoolTimer = stats.windCooldown;
+
+        // 初始化隐藏粒子
+        if (windVfx != null)
+        {
+            windVfx.gameObject.SetActive(false);
+            windVfx.Stop();
+        }
     }
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
+        // 触发管道订阅事件
+        MovePerformedEvent?.Invoke(ctx);
+
         if (ctx.phase == InputActionPhase.Performed)
         {
             moveDir = ctx.ReadValue<Vector2>();
@@ -41,6 +61,10 @@ public class PlayerManager : MonoBehaviour
         if (ctx.phase == InputActionPhase.Performed && isOnGround)
         {
             Debug.Log("Jump");
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayOneShot(AudioManager.Instance.jumpSfx, 0.75f);
+            }
             rb.linearVelocity = new Vector2(rb.linearVelocityX, stats.jumpForce);
         }
     }
@@ -152,35 +176,120 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 处理吹风逻辑
+    /// 处理吹风逻辑 + 复用粒子特效
     /// </summary>
     /// <param name="blowDir"></param>
     void ExecuteWindSkill(Vector2 blowDir)
     {
         Vector2 playerPos = transform.position;
 
-        //反作用力
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayOneShot(AudioManager.Instance.windSfx, 0.8f);
+        }
+
+        //粒子播放
+        if (windVfx != null)
+        {
+            float angle = Mathf.Atan2(blowDir.y, blowDir.x) * Mathf.Rad2Deg;
+            windVfx.transform.rotation = Quaternion.Euler(0, 0, angle);
+            windVfx.transform.localPosition = blowDir * 0.3f;
+
+            windVfx.gameObject.SetActive(true);
+            windVfx.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            windVfx.Play();
+
+            float playTime = windVfx.main.duration;
+            CancelInvoke(nameof(HideWindParticle));
+            Invoke(nameof(HideWindParticle), playTime);
+        }
+
+        // 反作用力
         rb.AddForce(-blowDir * stats.recoilForce, ForceMode2D.Impulse);
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(playerPos, stats.windRange, stats.windTargetLayer);
+        // 标记本次吹风是否碰到点燃的火把
+        bool hitLitTorch = false;
+
+        // 第一轮遍历：先处理所有火把，判断有没有点燃的火把被风吹到
         foreach (var hit in hits)
         {
             if (hit.transform == transform) continue;
 
             Vector2 targetPos = hit.transform.position;
             Vector2 targetOffsetDir = (targetPos - playerPos).normalized;
-
             float angle = Vector2.Angle(blowDir, targetOffsetDir);
             if (angle > stats.windSectorAngle / 2f) continue;
+            if (CheckObstacleBlock(playerPos, targetPos)) continue;
 
-            if (CheckObstacleBlock(playerPos, targetPos))
-                continue;
-
-            Rigidbody2D targetRb = hit.GetComponent<Rigidbody2D>();
-            if (targetRb != null)
+            TorchItem torch = hit.GetComponent<TorchItem>();
+            if (torch != null)
             {
-                targetRb.AddForce(blowDir * stats.pushForce, ForceMode2D.Impulse);
+                // 只要是点燃的火把，标记热风生效
+                if (torch.isLit)
+                {
+                    hitLitTorch = true;
+                }
+                // 吹风熄灭火把
+                torch.ExtinguishTorch();
             }
+        }
+
+        // 第二轮遍历：只有吹到点燃火把，才点燃可燃物
+        if (hitLitTorch)
+        {
+            foreach (var hit in hits)
+            {
+                if (hit.transform == transform) continue;
+
+                Vector2 targetPos = hit.transform.position;
+                Vector2 targetOffsetDir = (targetPos - playerPos).normalized;
+                float angle = Vector2.Angle(blowDir, targetOffsetDir);
+                if (angle > stats.windSectorAngle / 2f) continue;
+                if (CheckObstacleBlock(playerPos, targetPos)) continue;
+
+                Burnable burnable = hit.GetComponent<Burnable>();
+                if (burnable != null)
+                {
+                    burnable.StartBurn();
+                }
+
+                Rigidbody2D targetRb = hit.GetComponent<Rigidbody2D>();
+                if (targetRb != null)
+                {
+                    targetRb.AddForce(blowDir * stats.pushForce, ForceMode2D.Impulse);
+                }
+            }
+        }
+        else
+        {
+            // 没有火把，只给物体施加推力，不点燃可燃物
+            foreach (var hit in hits)
+            {
+                if (hit.transform == transform) continue;
+
+                Vector2 targetPos = hit.transform.position;
+                Vector2 targetOffsetDir = (targetPos - playerPos).normalized;
+                float angle = Vector2.Angle(blowDir, targetOffsetDir);
+                if (angle > stats.windSectorAngle / 2f) continue;
+                if (CheckObstacleBlock(playerPos, targetPos)) continue;
+
+                Rigidbody2D targetRb = hit.GetComponent<Rigidbody2D>();
+                if (targetRb != null)
+                {
+                    targetRb.AddForce(blowDir * stats.pushForce, ForceMode2D.Impulse);
+                }
+            }
+        }
+    }
+
+
+    // 延时隐藏粒子
+    void HideWindParticle()
+    {
+        if (windVfx != null)
+        {
+            windVfx.gameObject.SetActive(false);
         }
     }
 

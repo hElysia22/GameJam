@@ -16,7 +16,6 @@ public class WindManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     public Vector2 GetWindForcAtPosition(Vector2 worldPos)

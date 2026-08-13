@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   groundLayer:
     serializedVersion: 2
-    m_Bits: 136
+    m_Bits: 392
   windTargetLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -25,11 +25,11 @@ MonoBehaviour:
   maxMoveSpeed: 3
   groundFriction: 14
   jumpForce: 10
-  detectRadius: 0.2
+  detectRadius: 0.3
   airDrag: 2
   windRange: 3.5
   windSectorAngle: 60
   pushForce: 7
   recoilForce: 7
   windCooldown: 2
-  maxUpVelocity: 6
+  maxUpVelocity: 7.8

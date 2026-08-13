@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 121eb81fa9d937448b16ff7d68da230d
+    m_Address: Assets/Perfabs/WindObjects/Bridge.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 39fdb5ffa25ebcb4cbe3ceacffce7aef
     m_Address: Assets/Art/Sprites/tilemap_packed.png
     m_ReadOnly: 0
@@ -27,6 +32,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 413fba5d102e3c54291bb48f97f828cd
     m_Address: Assets/Art/Sprites/characters_packed.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80685e9bd960d5e43b1b0d87c0331415
+    m_Address: Assets/Perfabs/UI/Canvas.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

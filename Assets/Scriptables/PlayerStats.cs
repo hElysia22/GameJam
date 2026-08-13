@@ -25,4 +25,5 @@ public class PlayerStats : ScriptableObject
 
     [Header("垂直限制")]
     public float maxUpVelocity = 6f;
+
 }
